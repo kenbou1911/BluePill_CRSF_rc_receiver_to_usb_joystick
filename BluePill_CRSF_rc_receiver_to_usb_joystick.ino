@@ -30,12 +30,12 @@ void setup() {
 }
 
 void loop() {
-    while (Serial2.available()) {
+    bool gotNewPacket = false; 
+
+    while (Serial2.available() > 0) {
         uint8_t b = Serial2.read();
         
-        // 1. Wait for packet start
         if (ptr == 0) {
-            // Accept only packets starting with 0xEE (Transmitter) or 0xC8 (Receiver)
             if (b == 0xEE || b == 0xC8) {
                 crsf_packet[ptr++] = b;
             }
@@ -44,26 +44,30 @@ void loop() {
 
         crsf_packet[ptr++] = b;
 
-        // 2. Check Type at 3rd byte
         if (ptr == 3) {
-            // If not 0x16 (Channel Data), discard the packet
             if (crsf_packet[2] != 0x16) {
-                ptr = 0; // Reset buffer and wait for next packet
+                ptr = 0;
                 continue;
             }
         }
 
-        // 3. Parse when full packet length is reached
         if (ptr >= 2 && ptr == crsf_packet[1] + 2) {
-            parseCrsf();
-            updateJoystick();
-            
-            // Toggle LED on successful parse (blinks fast enough to look solid)
-            digitalWrite(PC13, !digitalRead(PC13)); 
+            parseCrsf(); // Parse and store in the channel variable
+            gotNewPacket = true; // Raise a flag to indicate that the latest data has arrived
             ptr = 0; 
+            
         }
         
         if (ptr >= 64) ptr = 0;
+        
+    }
+
+    // 2. After the serial read (resolves congestion), send it to USB only once
+    if (gotNewPacket) {
+        updateJoystick(); 
+        
+        // LED inversion (signal of successful analysis)
+        digitalWrite(PC13, !digitalRead(PC13)); 
     }
 }
 
@@ -98,9 +102,9 @@ void updateJoystick() {
 
     // [CH5]
     uint16_t c5 = channels[4];
-    Joystick.button(1,  c5 > 1600);           // High
+    Joystick.button(1,  c5 > 1600);                // High
     // Joystick.button(2,  c5 > 800 && c5 < 1200); // Mid - Not needed for 2-pos
-    // Joystick.button(3,  c5 < 400);            // Low
+    // Joystick.button(3,  c5 < 400);              // Low
 
     // [CH6]
     uint16_t c6 = channels[5];
