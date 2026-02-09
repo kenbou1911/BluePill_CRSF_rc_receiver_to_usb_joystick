@@ -8,7 +8,7 @@
 
 #include <USBComposite.h>
 
-// --- USB HID Configuration (Default 6-axis, 32-button spec) ---
+// --- USB HID Configuration (6-axis, 32-button) ---
 USBHID HID;
 HIDJoystick Joystick(HID); 
 
@@ -16,6 +16,7 @@ HIDJoystick Joystick(HID);
 uint8_t crsf_packet[64];
 uint16_t channels[16];
 uint8_t ptr = 0;
+uint32_t lastByteTime = 0;
 
 void setup() {
     pinMode(PC13, OUTPUT);
@@ -33,6 +34,7 @@ void loop() {
     bool gotNewPacket = false; 
 
     while (Serial2.available() > 0) {
+        lastByteTime = millis();
         uint8_t b = Serial2.read();
         
         if (ptr == 0) {
@@ -62,9 +64,15 @@ void loop() {
         
     }
 
-    // 2. After the serial read (resolves congestion), send it to USB only once
-    if (gotNewPacket) {
-        updateJoystick(); 
+    
+        if (millis() - lastByteTime > 10 && ptr != 0) {
+            ptr = 0;
+        
+    }
+
+    
+        if (gotNewPacket) {
+            updateJoystick(); 
         
         // LED inversion (signal of successful analysis)
         digitalWrite(PC13, !digitalRead(PC13)); 
@@ -88,13 +96,11 @@ void parseCrsf() {
 }
 
 void updateJoystick() {
-    // --- Update Axes (1ch - 4ch) ---
+    // --- Update Axes ---
     Joystick.X(map(channels[0], 172, 1811, 0, 1023));
     Joystick.Y(map(channels[1], 172, 1811, 0, 1023));
     Joystick.Xrotate(map(channels[2], 172, 1811, 0, 1023));
     Joystick.Yrotate(map(channels[3], 172, 1811, 0, 1023));
-    
-    // Sliders (Enable 11ch/12ch as axes if needed)
     Joystick.sliderLeft(map(channels[10], 172, 1811, 0, 1023));
     Joystick.sliderRight(map(channels[11], 172, 1811, 0, 1023));
 
