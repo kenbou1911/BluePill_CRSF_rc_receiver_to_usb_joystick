@@ -22,6 +22,6 @@ Connect the Bluepill's GND to the receiver's GND.
 Connect the Bluepill's PA_3 (Serial2 RX) to the receiver's TX.
 Bind the transmitter and receiver.
 
-The joystick is fixed with 6 axes and 32 buttons.
+The joystick has been upgraded from 6 axes and 32 buttons in v1.0.0 to 8 axes and 32 buttons in v1.1.0 .
 You cannot increase the number of axes or decrease the number of buttons.
 Customize it to suit your transmitter by uncommenting or adding code, increasing or decreasing Pos switches, and swapping channel numbers.
