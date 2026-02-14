@@ -1,24 +1,24 @@
 /*
  * BluePill_CRSF_rc_receiver_to_usb_joystick
- * * Version: 1.1.0
+ * * Version: 1.2.0
  * Copyright (c) 2026 kenbou1911
  * Licensed under the MIT License.
  * (See LICENSE file in the project root for details)
  */
-
+ 
 #include <USBComposite.h>
 
-// --- Custom HID Report Structure (8 axes x 10-bit + 32 buttons) ---
+// --- Custom HID Report Structure (8 axes 16-bit range + 32 buttons) ---
 struct MyJoystickReport_t {
     uint8_t reportID;      
-    unsigned x      : 10;
-    unsigned y      : 10;
-    unsigned z      : 10;
-    unsigned rx     : 10;
-    unsigned ry     : 10;
-    unsigned rz     : 10;
-    unsigned slider : 10;
-    unsigned dial   : 10;
+    uint16_t x;
+    uint16_t y;
+    uint16_t z;
+    uint16_t rx;
+    uint16_t ry;
+    uint16_t rz;
+    uint16_t slider;
+    uint16_t dial;
     uint32_t buttons;      
 } __attribute__((packed));
 
@@ -26,31 +26,31 @@ MyJoystickReport_t joyReport;
 
 // --- HID Descriptor ---
 const uint8_t reportDescription[] = {
-    0x05, 0x01,             // USAGE_PAGE (Generic Desktop)
-    0x09, 0x04,             // USAGE (Joystick)
-    0xA1, 0x01,             // COLLECTION (Application)
-    0x85, 0x01,             //   REPORT_ID (1)
+    0x05, 0x01,                   // USAGE_PAGE (Generic Desktop)
+    0x09, 0x04,                   // USAGE (Joystick)
+    0xA1, 0x01,                   // COLLECTION (Application)
+    0x85, 0x01,                   //   REPORT_ID (1)
 
-    // --- 8 Axes (10-bit each) ---
+    // --- 8 Axes (16-bit range inside 16-bit fields) ---
     0x05, 0x01,
-    0xA1, 0x00,             // COLLECTION (Physical)
-    0x15, 0x00,             // LOGICAL_MINIMUM (0)
-    0x26, 0xFF, 0x03,       // LOGICAL_MAXIMUM (1023)
-    0x75, 0x0A,             // REPORT_SIZE (10-bit)
-    0x95, 0x08,             // REPORT_COUNT (8)
+    0xA1, 0x00,                   // COLLECTION (Physical)
+    0x15, 0x00,                   // LOGICAL_MINIMUM (0)
+    0x27, 0xFF, 0xFF, 0x00, 0x00, // LOGICAL_MAXIMUM (65535) 16-bit (0xFFFF)
+    0x75, 0x10,                   // REPORT_SIZE (16-bit)
+    0x95, 0x08,                   // REPORT_COUNT (8)
     0x09, 0x30, 0x09, 0x31, 0x09, 0x32, 0x09, 0x33, 
     0x09, 0x34, 0x09, 0x35, 0x09, 0x36, 0x09, 0x37,
-    0x81, 0x02,             // INPUT (Data,Var,Abs)
-    0xC0,                   // END_COLLECTION
+    0x81, 0x02,                   // INPUT (Data,Var,Abs)
+    0xC0,                         // END_COLLECTION
 
     // --- 32 Buttons ---
-    0x05, 0x09,             // USAGE_PAGE (Button)
-    0x19, 0x01, 0x29, 0x20, // USAGE_MIN(1), MAX(32)
-    0x15, 0x00, 0x25, 0x01, // LOGICAL_MIN(0), MAX(1)
-    0x75, 0x01, 0x95, 0x20, // SIZE(1), COUNT(32)
-    0x81, 0x02,             // INPUT (Data,Var,Abs)
+    0x05, 0x09,                   // USAGE_PAGE (Button)
+    0x19, 0x01, 0x29, 0x20,       // USAGE_MIN(1), MAX(32)
+    0x15, 0x00, 0x25, 0x01,       // LOGICAL_MIN(0), MAX(1)
+    0x75, 0x01, 0x95, 0x20,       // SIZE(1), COUNT(32)
+    0x81, 0x02,                   // INPUT (Data,Var,Abs)
     
-    0xC0                    // END_COLLECTION
+    0xC0                          // END_COLLECTION
 };
 
 USBHID HID;
@@ -142,18 +142,18 @@ void parseCrsf() {
 void updateJoystick() {
     // --- Update Axes ---
     // Mapping: x=ch1, y=ch2, z=ch3, rx=ch4, ry=ch11, rz=ch12, slider=ch6, dial=ch7
-    joyReport.x      = map(channels[0],  172, 1811, 0, 1023);
-    joyReport.y      = map(channels[1],  172, 1811, 0, 1023);
-    joyReport.z      = map(channels[2],  172, 1811, 0, 1023);
-    joyReport.rx     = map(channels[3],  172, 1811, 0, 1023);
-    joyReport.ry     = map(channels[10], 172, 1811, 0, 1023);
-    joyReport.rz     = map(channels[11], 172, 1811, 0, 1023);
-    joyReport.slider = map(channels[5],  172, 1811, 0, 1023);
-    joyReport.dial   = map(channels[6],  172, 1811, 0, 1023);
+    joyReport.x      = map(channels[0],  172, 1811, 0, 65535);
+    joyReport.y      = map(channels[1],  172, 1811, 0, 65535);
+    joyReport.z      = map(channels[2],  172, 1811, 0, 65535);
+    joyReport.rx     = map(channels[3],  172, 1811, 0, 65535);
+    joyReport.ry     = map(channels[10], 172, 1811, 0, 65535);
+    joyReport.rz     = map(channels[11], 172, 1811, 0, 65535);
+    joyReport.slider = map(channels[5],  172, 1811, 0, 65535);
+    joyReport.dial   = map(channels[6],  172, 1811, 0, 65535);
 
-    // --- Map each channel to 3 buttons (Comment out unused lines) ---
+    // --- Map each channel to 3 buttons ---
     // Use setButton(buttonNumber, condition) to update joyReport.buttons bits.
-
+    
     // [CH5]
     uint16_t c5 = channels[4];
     setButton(1,  c5 > 1600);                // High
