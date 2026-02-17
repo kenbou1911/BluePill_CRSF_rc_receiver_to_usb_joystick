@@ -23,3 +23,13 @@ Connect the Bluepill's PA_3 (Serial2 RX) to the receiver's TX.
 Bind the transmitter and receiver.
 
 The joystick has been upgraded from 6 axes and 32 buttons in v1.0.0 to 8 axes and 32 buttons in v1.1.0. In v1.2.0, the analog axes have a 16-bit range. You can customize it to fit your transmitter by uncommenting or adding code, adding or removing Pos switches, swapping channel numbers, etc.
+
+The USB polling rate is set to 10ms in the Arduino_STM32 library.
+If you want to use a 1ms polling rate, use the following:
+\hardware\Arduino_STM32-master\STM32F1\libraries\USBComposite/usb_hid.c
+
+static uint8 txInterval = 0x0A;
+Change this to:
+static uint8 txInterval = 0x01;
+
+Write the sketch.
