@@ -29,7 +29,9 @@ If you want to use a 1ms polling rate, use the following:
 \hardware\Arduino_STM32-master\STM32F1\libraries\USBComposite/usb_hid.c
 
 static uint8 txInterval = 0x0A;
+
 Change this to:
+
 static uint8 txInterval = 0x01;
 
 Write the sketch.
