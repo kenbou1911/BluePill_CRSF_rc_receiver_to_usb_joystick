@@ -26,7 +26,7 @@ The joystick has been upgraded from 6 axes and 32 buttons in v1.0.0 to 8 axes an
 
 The USB polling rate is set to 10ms in the Arduino_STM32 library.
 If you want to use a 1ms polling rate, use the following:
-\hardware\Arduino_STM32-master\STM32F1\libraries\USBComposite/usb_hid.c
+\hardware\Arduino_STM32-master\STM32F1\libraries\USBComposite\usb_hid.c
 
 static uint8 txInterval = 0x0A;
 
