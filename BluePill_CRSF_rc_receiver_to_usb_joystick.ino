@@ -1,6 +1,6 @@
 /*
  * BluePill_CRSF_rc_receiver_to_usb_joystick
- * * Version: 1.2.0
+ * * Version: 1.3.0
  * Copyright (c) 2026 kenbou1911
  * Licensed under the MIT License.
  * (See LICENSE file in the project root for details)
@@ -137,6 +137,10 @@ void parseCrsf() {
     channels[9]  = ((crsf_packet[15] >> 3 | crsf_packet[16] << 5)                         & 0x07FF);
     channels[10] = ((crsf_packet[16] >> 6 | crsf_packet[17] << 2 | crsf_packet[18] << 10) & 0x07FF);
     channels[11] = ((crsf_packet[18] >> 1 | crsf_packet[19] << 7)                         & 0x07FF);
+    channels[12] = ((crsf_packet[19] >> 4 | crsf_packet[20] << 4)                         & 0x07FF);
+    channels[13] = ((crsf_packet[20] >> 7 | crsf_packet[21] << 1 | crsf_packet[22] << 9)  & 0x07FF);
+    channels[14] = ((crsf_packet[22] >> 2 | crsf_packet[23] << 6)                         & 0x07FF);
+    channels[15] = ((crsf_packet[23] >> 5 | crsf_packet[24] << 3)                         & 0x07FF);
 }
 
 void updateJoystick() {
@@ -156,51 +160,79 @@ void updateJoystick() {
     
     // [CH5]
     uint16_t c5 = channels[4];
-    setButton(1,  c5 > 1600);                // High
-    // setButton(2,  c5 > 800 && c5 < 1200); // Mid
-    // setButton(3,  c5 < 400);              // Low
+    setButton(1,  c5 > 1600);                 // High
+    // setButton(2,  c5 >  800 && c5 < 1200); // Mid
+    // setButton(3,  c5 <  400);              // Low
 
     // [CH6]
     uint16_t c6 = channels[5];
     setButton(4,  c6 > 1600);
-    setButton(5,  c6 > 800 && c6 < 1200);
-    setButton(6,  c6 < 400);
+    setButton(5,  c6 >  800 && c6 < 1200);
+    setButton(6,  c6 <  400);
 
     // [CH7]
     uint16_t c7 = channels[6];
     setButton(7,  c7 > 1600);
-    setButton(8,  c7 > 800 && c7 < 1200);
-    setButton(9,  c7 < 400);
+    setButton(8,  c7 >  800 && c7 < 1200);
+    setButton(9,  c7 <  400);
 
     // [CH8]
     uint16_t c8 = channels[7];
     setButton(10, c8 > 1600);
-    // setButton(11, c8 > 800 && c8 < 1200);
-    // setButton(12, c8 < 400);
+    // setButton(11, c8 >  800 && c8 < 1200);
+    // setButton(12, c8 <  400);
 
     // [CH9]
     uint16_t c9 = channels[8];
     setButton(13, c9 > 1600);
-    setButton(14, c9 > 800 && c9 < 1200);
-    setButton(15, c9 < 400);
+    setButton(14, c9 >  800 && c9 < 1200);
+    setButton(15, c9 <  400);
 
     // [CH10]
     uint16_t c10 = channels[9];
     setButton(16, c10 > 1600);
-    setButton(17, c10 > 800 && c10 < 1200);
-    setButton(18, c10 < 400);
+    setButton(17, c10 >  800 && c10 < 1200);
+    setButton(18, c10 <  400);
 
     // [CH11]
     uint16_t c11 = channels[10];
     setButton(19, c11 > 1600);
-    setButton(20, c11 > 800 && c11 < 1200);
-    setButton(21, c11 < 400);
+    setButton(20, c11 >  800 && c11 < 1200);
+    setButton(21, c11 <  400);
 
     // [CH12]
     uint16_t c12 = channels[11];
     setButton(22, c12 > 1600);
-    setButton(23, c12 > 800 && c12 < 1200);
-    setButton(24, c12 < 400);
+    setButton(23, c12 >  800 && c12 < 1200);
+    setButton(24, c12 <  400);
+
+    // [CH13]
+    // uint16_t c13 = channels[12];
+    // setButton(25, c13 > 1600);
+    // setButton(26, c13 >  800 && c13 < 1200);
+    // setButton(27, c13 <  400);
+
+    // [CH14]
+    // uint16_t c14 = channels[13];
+    // setButton( 2, c14 > 1600);
+    // setButton(11, c14 >  800 && c14 < 1200);
+    // setButton( 3, c14 <  400);
+
+    // [CH15]
+    // uint16_t c15 = channels[14];
+    // setButton(28, c15 > 1600);
+    // setButton(29, c15 >  800 && c15 < 1200);
+    // setButton(30, c15 <  400);
+    
+    // [CH16]
+    uint16_t c16 = channels[15];
+    setButton(27, c16 <  300);                    // -100%  (172)
+    setButton(28, c16 >  300 && c16 <  600);      //  -60%  (500)
+    setButton(29, c16 >  600 && c16 <  900);      //  -20%  (827)
+    // --- This is the blank area where the mixer is at 0%  (992) ---
+    setButton(30, c16 > 1100 && c16 < 1350);      //  +20% (1155)
+    setButton(31, c16 > 1350 && c16 < 1650);      //  +60% (1483)
+    setButton(32, c16 > 1650);                    // +100% (1811)
 
     // Send the custom HID report
     reporter.sendReport();
