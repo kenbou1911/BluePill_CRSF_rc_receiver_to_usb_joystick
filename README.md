@@ -35,3 +35,11 @@ Change this to:
 static uint8 txInterval = 0x01;
 
 Write the sketch.
+
+Changes in v1.3.0.
+Added ch13 to ch16 to parseCrsf.
+I changed ch16 to a 6pos switch.
+ch13 to ch16 only function at ELRS Full Res16ch Rate/2.
+If your transmitter only has channels 1 to 12, and you specify buttons 13 to 16 with a code, those buttons may stay on or light up (Jumper Smart).
+If you are concerned, please comment out the code for the button specified in that channel.
+Tested with Jumper Smart and RM TX15.
