@@ -1,6 +1,6 @@
 /*
  * BluePill_SBUS_rc_receiver_to_usb_joystick
- * * Version: 1.3.0
+ * * Version: 1.4.0
  * Copyright (c) 2026 kenbou1911
  * Licensed under the MIT License.
  * (See LICENSE file in the project root for details)
@@ -74,6 +74,9 @@ uint32_t lastByteTime = 0;
 void setup() {
     pinMode(PC13, OUTPUT);
     digitalWrite(PC13, HIGH);
+
+USBComposite.setProductId(0x0025);              // Shift from the original 0x0024 to "0x0025"
+USBComposite.setProductString("RCRX_usbJoy_A"); // Display name on PC (alphanumeric characters)
 
     joyReport.reportID = 1;
     HID.begin(reportDescription, sizeof(reportDescription));
