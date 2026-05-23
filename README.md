@@ -47,3 +47,5 @@ Tested with Jumper Smart and RM TX15.
 After v1.3.0, I wrote new, separate code for the SBUS protocol.
 I confirmed operation in the happymodel ep1's web UI by setting the serial protocol to Inverted SBUS and the UART baud in OPTIONS to 100000.
 SBUS receivers without Inverted SBUS functionality require an SBUS inverter.
+
+After v1.4.0,Resolved the USB enumeration conflict where multiple Blue Pill devices were identified as "Maple." Implemented unique VID/PID pairs and custom string descriptors to distinguish individual joystick controllers on the same system. If you wish to distinguish multiple Blue Pill joysticks, please assign and flash a unique VID/PID pair for each device.
